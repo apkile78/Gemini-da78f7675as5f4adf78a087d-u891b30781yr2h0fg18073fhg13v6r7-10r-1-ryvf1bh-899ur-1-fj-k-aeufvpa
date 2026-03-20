@@ -1,4 +1,6 @@
-// ELEMENTS
+// =========================================================
+//  GLOBAL ELEMENTS
+// =========================================================
 const searchContainer = document.getElementById("searchContainer");
 const urlInput = document.getElementById("urlInput");
 const savedContainer = document.getElementById("savedSites");
@@ -6,12 +8,63 @@ const workingContainer = document.getElementById("workingSites");
 const viewer = document.getElementById("viewer");
 const autoBox = document.getElementById("autocomplete");
 
+const mnuBtn = document.getElementById("mnuBtn");
+const hdeBtn = document.getElementById("hdeBtn");
+
 let embedMode = "iframe";
 let popupMode = "about";
 let currentUrl = "";
 let coreEl = null;
 
-// POPUP MODE TOGGLES
+// =========================================================
+//  MAIN PAGE LOCK SYSTEM (G → H → J)
+// =========================================================
+let unlockStage = 0;
+let uiUnlocked = false;
+
+// Detect if this is the MAIN PAGE (not a popup)
+const isMainPage =
+    !location.href.startsWith("about:blank") &&
+    !location.href.startsWith("blob:");
+
+// Hide UI initially ONLY on main page
+if (isMainPage) {
+    document.body.classList.add("locked");
+    hideUI(true);
+}
+
+// Key sequence unlock
+document.addEventListener("keydown", e => {
+    if (!isMainPage || uiUnlocked) return;
+
+    if (unlockStage === 0 && e.key.toLowerCase() === "g") unlockStage = 1;
+    else if (unlockStage === 1 && e.key.toLowerCase() === "h") unlockStage = 2;
+    else if (unlockStage === 2 && e.key.toLowerCase() === "j") {
+        uiUnlocked = true;
+        document.body.classList.remove("locked");
+        hideUI(false);
+    } else {
+        unlockStage = 0;
+    }
+});
+
+// =========================================================
+//  UI HIDE / UNHIDE SYSTEM
+// =========================================================
+function hideUI(state) {
+    if (state) {
+        document.body.classList.add("uiHidden");
+    } else {
+        document.body.classList.remove("uiHidden");
+    }
+}
+
+hdeBtn.onclick = () => hideUI(true);
+mnuBtn.onclick = () => hideUI(false);
+
+// =========================================================
+//  POPUP MODE TOGGLES
+// =========================================================
 document.getElementById("abtBtn").onclick = () => {
     popupMode = "about";
     abtBtn.classList.add("active");
@@ -24,7 +77,9 @@ document.getElementById("blbBtn").onclick = () => {
     abtBtn.classList.remove("active");
 };
 
-// AUTOCOMPLETE
+// =========================================================
+//  AUTOCOMPLETE
+// =========================================================
 let autoTimer = null;
 
 urlInput.addEventListener("input", () => {
@@ -54,7 +109,9 @@ function runAutocomplete() {
     }
 }
 
-// EMBED MODE SWITCHING
+// =========================================================
+//  EMBED MODE SWITCHING
+// =========================================================
 document.querySelectorAll(".modeBtn").forEach(btn => {
     btn.addEventListener("click", () => {
         document.querySelectorAll(".modeBtn").forEach(b => b.classList.remove("active"));
@@ -64,7 +121,9 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
     });
 });
 
-// VIEWER
+// =========================================================
+//  VIEWER
+// =========================================================
 function updateViewer(url) {
     currentUrl = url;
     if (!url) {
@@ -114,7 +173,9 @@ function copyCoreProps(oldEl, newEl) {
     if (oldEl.data) newEl.data = oldEl.data;
 }
 
-// BASIC ACTIONS
+// =========================================================
+//  BASIC ACTIONS
+// =========================================================
 function closeSearch() {
     searchContainer.classList.remove("active");
 }
@@ -126,7 +187,15 @@ function loadSite() {
     updateViewer(url);
 }
 
-// SAVED SITES
+// ENTER loads site (only after unlock)
+document.addEventListener("keydown", e => {
+    if (!uiUnlocked) return;
+    if (e.key === "Enter") loadSite();
+});
+
+// =========================================================
+//  SAVED SITES
+// =========================================================
 function saveSite() {
     const urlToSave = currentUrl || urlInput.value.trim();
     if (!urlToSave) return;
@@ -179,7 +248,9 @@ function displaySavedSites() {
 }
 displaySavedSites();
 
-// WORKING SITE DETECTION
+// =========================================================
+//  WORKING SITE DETECTION
+// =========================================================
 let workingSites = [];
 
 function testSite(url) {
@@ -242,27 +313,38 @@ function displayWorkingSites() {
 
 detectWorkingSites();
 
-// ABOUT:BLANK POPUP ENGINE (short-circuits when already in a popup)
+// =========================================================
+//  POPUP CAPABILITY DISABLING
+// =========================================================
+function updatePopupCapabilities() {
+    const isAboutBlank = location.href.startsWith("about:blank");
+    const isBlob = location.href.startsWith("blob:");
+
+    const abtBtn = document.getElementById("abtBtn");
+    const blbBtn = document.getElementById("blbBtn");
+    const poptBtn = document.getElementById("clckBtn");
+    const vewBtn = document.getElementById("vtprBtn");
+
+    abtBtn.classList.remove("disabled");
+    blbBtn.classList.remove("disabled");
+    poptBtn.classList.remove("disabled");
+    vewBtn.classList.remove("disabled");
+
+    if (isAboutBlank || isBlob) {
+        abtBtn.classList.add("disabled");
+        poptBtn.classList.add("disabled");
+        vewBtn.classList.add("disabled");
+    }
+}
+
+updatePopupCapabilities();
+
+// =========================================================
+//  POPUP ENGINES (NO REDIRECT HACKS)
+// =========================================================
 function openAboutBlank(url) {
-    // If we're already in a popup (about:blank navi), don't open another window.
-    // Just navigate this window instead. This avoids Chrome's popup-from-popup blocking.
-    if (window.opener) {
-        window.location.href = url;
-        return;
-    }
-
     const win = window.open("", "_blank");
-
-    if (!win) {
-        const a = document.createElement("a");
-        a.href = url;
-        a.target = "_blank";
-        a.rel = "noopener";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        return;
-    }
+    if (!win) return;
 
     win.document.write(`
         <!DOCTYPE html>
@@ -295,7 +377,6 @@ function openAboutBlank(url) {
     win.document.close();
 }
 
-// BLOB POPUP (unchanged)
 function openBlobPopup(url) {
     const html = `
         <!DOCTYPE html>
@@ -330,7 +411,9 @@ function openBlobPopup(url) {
     window.open(blobUrl, "_blank");
 }
 
-// POPUP BUTTONS
+// =========================================================
+//  POPUP BUTTONS
+// =========================================================
 function clck() {
     const url = location.href;
     if (popupMode === "about") openAboutBlank(url);
@@ -346,21 +429,24 @@ function vtpr() {
     else openBlobPopup(url);
 }
 
-// BUTTON BINDINGS
+// =========================================================
+//  BUTTON BINDINGS
+// =========================================================
 goBtn.onclick = loadSite;
 saveBtn.onclick = saveSite;
 closeBtn.onclick = closeSearch;
 clckBtn.onclick = clck;
 vtprBtn.onclick = vtpr;
 
-// MENU TOGGLE
 openBtn.onclick = () => {
+    if (!uiUnlocked) return;
     searchContainer.classList.toggle("active");
 };
 
-// KEYBOARD SHORTCUT
+// =========================================================
+//  KEYBOARD SHORTCUTS (DISABLED UNTIL UNLOCK)
+// =========================================================
 document.addEventListener("keydown", e => {
-    if (e.key === "[") {
-        searchContainer.classList.toggle("active");
-    }
+    if (!uiUnlocked) return;
+    if (e.key === "[") searchContainer.classList.toggle("active");
 });
