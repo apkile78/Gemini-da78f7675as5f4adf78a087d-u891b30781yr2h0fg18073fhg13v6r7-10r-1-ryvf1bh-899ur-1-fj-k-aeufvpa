@@ -1,6 +1,4 @@
-// =========================================================
-//  GLOBAL ELEMENTS
-// =========================================================
+// ELEMENTS
 const searchContainer = document.getElementById("searchContainer");
 const urlInput = document.getElementById("urlInput");
 const savedContainer = document.getElementById("savedSites");
@@ -8,72 +6,12 @@ const workingContainer = document.getElementById("workingSites");
 const viewer = document.getElementById("viewer");
 const autoBox = document.getElementById("autocomplete");
 
-const mnuBtn = document.getElementById("openBtn");
-const hdeBtn = document.getElementById("hdeBtn");
-
 let embedMode = "iframe";
 let popupMode = "about";
 let currentUrl = "";
 let coreEl = null;
 
-// =========================================================
-//  MAIN PAGE LOCK SYSTEM (G → H → J)
-// =========================================================
-let unlockStage = 0;
-let uiUnlocked = false;
-
-const isMainPage =
-    !location.href.startsWith("about:blank") &&
-    !location.href.startsWith("blob:");
-
-if (isMainPage) {
-    document.body.classList.add("locked");
-    hideUI(true);
-}
-
-document.addEventListener("keydown", e => {
-    if (!isMainPage || uiUnlocked) return;
-
-    if (unlockStage === 0 && e.key.toLowerCase() === "g") unlockStage = 1;
-    else if (unlockStage === 1 && e.key.toLowerCase() === "h") unlockStage = 2;
-    else if (unlockStage === 2 && e.key.toLowerCase() === "j") {
-        uiUnlocked = true;
-        document.body.classList.remove("locked");
-        hideUI(false);
-    } else {
-        unlockStage = 0;
-    }
-});
-
-// =========================================================
-//  UI HIDE / UNHIDE SYSTEM
-// =========================================================
-function hideUI(state) {
-    if (state) {
-        document.body.classList.add("uiHidden");
-    } else {
-        document.body.classList.remove("uiHidden");
-    }
-}
-
-hdeBtn.onclick = () => hideUI(true);
-
-mnuBtn.onclick = () => {
-    // If UI is hidden → unhide it
-    if (document.body.classList.contains("uiHidden")) {
-        hideUI(false);
-        return;
-    }
-
-    // If UI is visible → toggle menu
-    if (uiUnlocked) {
-        searchContainer.classList.toggle("active");
-    }
-};
-
-// =========================================================
-//  POPUP MODE TOGGLES
-// =========================================================
+// POPUP MODE TOGGLES
 document.getElementById("abtBtn").onclick = () => {
     popupMode = "about";
     abtBtn.classList.add("active");
@@ -86,9 +24,7 @@ document.getElementById("blbBtn").onclick = () => {
     abtBtn.classList.remove("active");
 };
 
-// =========================================================
-//  AUTOCOMPLETE
-// =========================================================
+// AUTOCOMPLETE
 let autoTimer = null;
 
 urlInput.addEventListener("input", () => {
@@ -118,9 +54,7 @@ function runAutocomplete() {
     }
 }
 
-// =========================================================
-//  EMBED MODE SWITCHING
-// =========================================================
+// EMBED MODE SWITCHING
 document.querySelectorAll(".modeBtn").forEach(btn => {
     btn.addEventListener("click", () => {
         document.querySelectorAll(".modeBtn").forEach(b => b.classList.remove("active"));
@@ -130,9 +64,7 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
     });
 });
 
-// =========================================================
-//  VIEWER
-// =========================================================
+// VIEWER
 function updateViewer(url) {
     currentUrl = url;
     if (!url) {
@@ -182,9 +114,7 @@ function copyCoreProps(oldEl, newEl) {
     if (oldEl.data) newEl.data = oldEl.data;
 }
 
-// =========================================================
-//  BASIC ACTIONS
-// =========================================================
+// BASIC ACTIONS
 function closeSearch() {
     searchContainer.classList.remove("active");
 }
@@ -196,14 +126,7 @@ function loadSite() {
     updateViewer(url);
 }
 
-document.addEventListener("keydown", e => {
-    if (!uiUnlocked) return;
-    if (e.key === "Enter") loadSite();
-});
-
-// =========================================================
-//  SAVED SITES
-// =========================================================
+// SAVED SITES
 function saveSite() {
     const urlToSave = currentUrl || urlInput.value.trim();
     if (!urlToSave) return;
@@ -236,6 +159,7 @@ function displaySavedSites() {
         link.className = "link";
         link.textContent = site;
 
+        // ⭐ NEW BEHAVIOR: fill search bar + close menu (NO loading)
         link.onclick = () => {
             urlInput.value = site;
             searchContainer.classList.remove("active");
@@ -256,9 +180,7 @@ function displaySavedSites() {
 }
 displaySavedSites();
 
-// =========================================================
-//  WORKING SITE DETECTION
-// =========================================================
+// WORKING SITE DETECTION
 let workingSites = [];
 
 function testSite(url) {
@@ -309,6 +231,7 @@ function displayWorkingSites() {
         link.className = "link";
         link.textContent = url;
 
+        // ⭐ NEW BEHAVIOR: fill search bar + close menu (NO loading)
         link.onclick = () => {
             urlInput.value = url;
             searchContainer.classList.remove("active");
@@ -321,39 +244,22 @@ function displayWorkingSites() {
 
 detectWorkingSites();
 
-// =========================================================
-//  POPUP CAPABILITY DISABLING
-// =========================================================
-function updatePopupCapabilities() {
-    const isAboutBlank = location.href.startsWith("about:blank");
-    const isBlob = location.href.startsWith("blob:");
-
-    const abtBtn = document.getElementById("abtBtn");
-    const blbBtn = document.getElementById("blbBtn");
-    const poptBtn = document.getElementById("clckBtn");
-    const vewBtn = document.getElementById("vtprBtn");
-
-    abtBtn.classList.remove("disabled");
-    blbBtn.classList.remove("disabled");
-    poptBtn.classList.remove("disabled");
-    vewBtn.classList.remove("disabled");
-
-    if (isAboutBlank || isBlob) {
-        abtBtn.classList.add("disabled");
-        poptBtn.classList.add("disabled");
-        vewBtn.classList.add("disabled");
-    }
-}
-
-updatePopupCapabilities();
-
-// =========================================================
-//  POPUP ENGINES (NO REDIRECT HACKS)
-// =========================================================
+// POPUP ENGINES
 function openAboutBlank(url) {
-    const win = window.open("", "_blank");
-    if (!win) return;
+    const win = window.open("about:blank", "_blank");
 
+    if (!win) {
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+    }
+
+    win.document.open();
     win.document.write(`
         <!DOCTYPE html>
         <html>
@@ -381,7 +287,6 @@ function openAboutBlank(url) {
         </body>
         </html>
     `);
-
     win.document.close();
 }
 
@@ -419,9 +324,7 @@ function openBlobPopup(url) {
     window.open(blobUrl, "_blank");
 }
 
-// =========================================================
-//  POPUP BUTTONS
-// =========================================================
+// POPUP BUTTONS
 function clck() {
     const url = location.href;
     if (popupMode === "about") openAboutBlank(url);
@@ -437,21 +340,17 @@ function vtpr() {
     else openBlobPopup(url);
 }
 
-// =========================================================
-//  BUTTON BINDINGS
-// =========================================================
+// BUTTON BINDINGS
 goBtn.onclick = loadSite;
 saveBtn.onclick = saveSite;
 closeBtn.onclick = closeSearch;
 clckBtn.onclick = clck;
 vtprBtn.onclick = vtpr;
+openBtn.onclick = () => searchContainer.classList.add("active");
 
-openBtn.onclick = mnuBtn.onclick; // ensure no override
-
-openBtn.onclick = mnuBtn.onclick; // safety
-
-// Keyboard shortcut for menu toggle
+// KEYBOARD SHORTCUT
 document.addEventListener("keydown", e => {
-    if (!uiUnlocked) return;
-    if (e.key === "[") searchContainer.classList.toggle("active");
+    if (e.key === "[") {
+        searchContainer.classList.toggle("active");
+    }
 });
