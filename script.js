@@ -184,7 +184,7 @@ function displaySavedSites() {
         del.className = "deleteBtn";
         del.textContent = "x";
         del.onclick = e => {
-           e.stopPropagation();
+            e.stopPropagation();
             deleteSite(index);
         };
 
@@ -333,7 +333,34 @@ tstBtn.onclick = () => {
 };
 
 // =========================================================
-//  POPUP MODE (FIXED — NO WHITE OUTLINE)
+//  POPUP MODE TOGGLE (abt/blb) — FIXED
+// =========================================================
+abtBtn.onclick = () => {
+    popupMode = "about";
+
+    abtBtn.classList.add("active");
+    blbBtn.classList.remove("active");
+
+    abtBtn.style.background = "";
+    abtBtn.style.color = "";
+    blbBtn.style.background = "";
+    blbBtn.style.color = "";
+};
+
+blbBtn.onclick = () => {
+    popupMode = "blob";
+
+    blbBtn.classList.add("active");
+    abtBtn.classList.remove("active");
+
+    blbBtn.style.background = "";
+    blbBtn.style.color = "";
+    abtBtn.style.background = "";
+    abtBtn.style.color = "";
+};
+
+// =========================================================
+//  POPUP (popt) — NAVIGATOR POPUP, NO WHITE OUTLINE
 // =========================================================
 clckBtn.onclick = () => {
     const navUrl = location.origin + location.pathname;
@@ -368,32 +395,38 @@ clckBtn.onclick = () => {
 };
 
 // =========================================================
-//  POPUP BUTTONS
+//  VIEW POPUP (vew) — CURRENT SITE POPUP, NO WHITE OUTLINE
 // =========================================================
 vtprBtn.onclick = () => {
     let url = currentUrl || urlInput.value.trim();
     if (!url) return;
     if (!url.startsWith("http")) url = "https://" + url;
 
-    if (popupMode === "about") window.open(url, "_blank");
-    else {
-        const blob = new Blob([`
-            <style>
-                html, body {
-                    margin: 0;
-                    padding: 0;
-                    background: #000;
-                    overflow: hidden;
-                }
-                iframe {
-                    width: 100vw;
-                    height: 100vh;
-                    border: none;
-                }
-            </style>
-            <iframe src="${url}"></iframe>
-        `], { type: "text/html" });
+    const popupHTML = `
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: #000;
+                overflow: hidden;
+            }
+            iframe {
+                width: 100vw;
+                height: 100vh;
+                border: none;
+            }
+        </style>
+        <iframe src="${url}"></iframe>
+    `;
 
+    if (popupMode === "about") {
+        const win = window.open("about:blank", "_blank");
+        if (win) {
+            win.document.write(popupHTML);
+            win.document.close();
+        }
+    } else {
+        const blob = new Blob([popupHTML], { type: "text/html" });
         window.open(URL.createObjectURL(blob), "_blank");
     }
 };
