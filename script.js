@@ -13,6 +13,8 @@ let popupMode = "about";
 let currentUrl = "";
 let coreEl = null;
 
+let workingSites = [];   // ⭐ REQUIRED FIX
+
 // =========================================================
 //  MENU TOGGLE
 // =========================================================
