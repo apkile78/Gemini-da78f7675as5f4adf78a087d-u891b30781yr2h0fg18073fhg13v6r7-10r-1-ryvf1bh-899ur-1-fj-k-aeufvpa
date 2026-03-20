@@ -22,12 +22,12 @@
     }
 
     /* UI HIDDEN MODE */
-    /* Keep topBar visible, but hide everything inside except #openBtn */
+    /* Keep topBar visible, but hide everything inside EXCEPT #openBtn */
     body.uiHidden #topBar {
         display: flex !important;
     }
 
-    body.uiHidden #topBar > * {
+    body.uiHidden #topBar > *:not(#openBtn) {
         display: none !important;
     }
 
