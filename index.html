@@ -17,29 +17,23 @@
     body.locked #topBar,
     body.locked #viewer,
     body.locked #searchContainer,
-    body.locked #autocomplete,
-    body.locked #openBtn {
+    body.locked #autocomplete {
         display: none !important;
-    }
-
-    body.locked {
-        background: #000;
     }
 
     /* UI HIDDEN MODE */
-    body.uiHidden #topBar,
-    body.uiHidden #searchContainer,
-    body.uiHidden #autocomplete {
+    /* Keep topBar visible, but hide everything inside except #openBtn */
+    body.uiHidden #topBar {
+        display: flex !important;
+    }
+
+    body.uiHidden #topBar > * {
         display: none !important;
     }
 
-    /* Viewer stays visible in uiHidden mode */
-    body.uiHidden #viewer {
-        display: block !important;
-    }
-
-    /* mnu button invisible unless hovered when UI is hidden */
+    /* mnu stays in place, invisible until hovered */
     body.uiHidden #openBtn {
+        display: inline-block !important;
         opacity: 0;
         transition: opacity 0.15s;
         pointer-events: auto;
@@ -49,10 +43,15 @@
         opacity: 1;
     }
 
-    /* DISABLED BUTTONS */
-    .disabled {
-        opacity: 0.3 !important;
-        pointer-events: none !important;
+    /* Hide menu + autocomplete when UI is hidden */
+    body.uiHidden #searchContainer,
+    body.uiHidden #autocomplete {
+        display: none !important;
+    }
+
+    /* Viewer stays visible */
+    body.uiHidden #viewer {
+        display: block !important;
     }
 
     /* TOP BAR */
@@ -173,7 +172,6 @@
         background: #000;
         max-height: calc(100vh - 60px);
         overflow-y: auto;
-        border: none;
         border-radius: 4px;
         z-index: 20;
     }
@@ -188,14 +186,6 @@
     .autoItem:hover {
         background: #111;
     }
-
-    /* ⭐ POSITION THE MNU BUTTON EXACTLY WHERE IT WAS ⭐ */
-    #openBtn {
-        position: absolute;
-        top: 10px;
-        left: 210px; /* adjust if needed */
-        z-index: 9999;
-    }
     </style>
 </head>
 
@@ -206,8 +196,7 @@
 
         <button id="goBtn">go</button>
         <button id="saveBtn">sve</button>
-
-        <!-- hde stays in the top bar -->
+        <button id="openBtn">mnu</button>
         <button id="hdeBtn">hde</button>
 
         <button id="clckBtn">popt</button>
@@ -223,13 +212,8 @@
         <div class="modeBtn" data-mode="embed">Embed</div>
     </div>
 
-    <!-- ⭐ MNU BUTTON MOVED OUTSIDE TOP BAR ⭐ -->
-    <button id="openBtn">mnu</button>
-
-    <!-- Autocomplete dropdown -->
     <div id="autocomplete"></div>
 
-    <!-- Slide-out menu -->
     <div id="searchContainer">
         <button id="closeBtn">Close</button>
 
@@ -240,7 +224,6 @@
         <div id="workingSites"></div>
     </div>
 
-    <!-- Viewer -->
     <div id="viewer"></div>
 
     <script src="siteDB.js"></script>
