@@ -17,7 +17,8 @@
     body.locked #topBar,
     body.locked #viewer,
     body.locked #searchContainer,
-    body.locked #autocomplete {
+    body.locked #autocomplete,
+    body.locked #openBtn {
         display: none !important;
     }
 
@@ -41,6 +42,7 @@
     body.uiHidden #openBtn {
         opacity: 0;
         transition: opacity 0.15s;
+        pointer-events: auto;
     }
 
     body.uiHidden #openBtn:hover {
@@ -186,6 +188,14 @@
     .autoItem:hover {
         background: #111;
     }
+
+    /* ⭐ POSITION THE MNU BUTTON EXACTLY WHERE IT WAS ⭐ */
+    #openBtn {
+        position: absolute;
+        top: 10px;
+        left: 210px; /* adjust if needed */
+        z-index: 9999;
+    }
     </style>
 </head>
 
@@ -196,9 +206,8 @@
 
         <button id="goBtn">go</button>
         <button id="saveBtn">sve</button>
-        <button id="openBtn">mnu</button>
 
-        <!-- ⭐ NEW BUTTON ADDED ⭐ -->
+        <!-- hde stays in the top bar -->
         <button id="hdeBtn">hde</button>
 
         <button id="clckBtn">popt</button>
@@ -213,6 +222,9 @@
         <div class="modeBtn" data-mode="object">Object</div>
         <div class="modeBtn" data-mode="embed">Embed</div>
     </div>
+
+    <!-- ⭐ MNU BUTTON MOVED OUTSIDE TOP BAR ⭐ -->
+    <button id="openBtn">mnu</button>
 
     <!-- Autocomplete dropdown -->
     <div id="autocomplete"></div>
