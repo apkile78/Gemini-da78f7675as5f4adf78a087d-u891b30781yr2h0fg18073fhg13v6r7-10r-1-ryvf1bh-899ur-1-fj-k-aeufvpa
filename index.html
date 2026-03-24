@@ -5,8 +5,6 @@
 <title>Your Game Navigator</title>
 
 <style>
-/* ————— EXISTING STYLES ————— */
-
 body {
     margin: 0;
     background: #000;
@@ -14,6 +12,7 @@ body {
     font-family: sans-serif;
 }
 
+/* TOP BAR */
 #topBar {
     width: 100%;
     height: 60px;
@@ -24,39 +23,77 @@ body {
     box-sizing: border-box;
     transition: 0.25s ease;
 }
+#topBar button { margin-right: 8px; }
 
-#sidebar {
-    width: 260px;
+/* SIDEBAR / SEARCH MENU */
+#searchContainer {
+    width: 300px;
     background: #111;
     height: 100vh;
     position: fixed;
-    left: 0;
+    left: -300px;
     top: 0;
     padding: 10px;
     box-sizing: border-box;
+    transition: 0.25s ease;
     z-index: 9998;
 }
-
-#closeBtn, #hdeBtn {
-    margin-right: 6px;
+#searchContainer.active {
+    left: 0;
 }
 
-/* ————— NEW UI-HIDE SYSTEM ————— */
+#urlInput, #searchInput {
+    width: 100%;
+    padding: 6px;
+    margin: 6px 0;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+}
 
-/* Slide top bar up when hidden */
+#autocomplete, #results, #savedSites, #workingSites {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #181818;
+    border: 1px solid #333;
+    margin-top: 6px;
+}
+
+.autoItem, .savedItem {
+    padding: 6px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+.autoItem:hover, .savedItem:hover {
+    background: #333;
+}
+
+.deleteBtn {
+    float: right;
+    color: #f44;
+    cursor: pointer;
+}
+
+/* VIEWER */
+#viewer {
+    width: 100%;
+    height: calc(100vh - 60px);
+    background: #000;
+}
+
+/* NEW UI-HIDE SYSTEM */
 body.uiHidden #topBar {
     transform: translateY(-60px);
 }
 
-/* mnu button (bottom-right, invisible unless hovered) */
 #mnuReveal {
     position: fixed;
     bottom: 10px;
     right: 10px;
     padding: 4px 8px;
     font-size: 12px;
-    opacity: 0;               /* fully invisible */
-    pointer-events: none;     /* inactive unless UI hidden */
+    opacity: 0;
+    pointer-events: none;
     background: #111;
     border: 1px solid #444;
     color: #fff;
@@ -65,40 +102,60 @@ body.uiHidden #topBar {
     z-index: 9999;
 }
 
-/* When UI is hidden, the button becomes hover-active */
 body.uiHidden #mnuReveal {
     pointer-events: auto;
 }
-
-/* Only visible when hovered */
 body.uiHidden #mnuReveal:hover {
     opacity: 1;
 }
-
 </style>
 </head>
 
 <body>
 
-<!-- ————— TOP BAR ————— -->
+<!-- TOP BAR -->
 <div id="topBar">
-    <button id="menuBtn">Menu</button>
-    <button id="randomBtn">Random</button>
-    <button id="searchBtn">Search</button>
+    <button id="openBtn">Menu</button>
+    <button id="goBtn">Go</button>
+    <button id="saveBtn">Save</button>
+    <button id="tstBtn">tst</button>
+
+    <!-- embed mode buttons -->
+    <button class="modeBtn active" data-mode="iframe">iframe</button>
+    <button class="modeBtn" data-mode="object">object</button>
+    <button class="modeBtn" data-mode="embed">embed</button>
+
+    <!-- popup mode -->
+    <button id="abtBtn" class="active">about</button>
+    <button id="blbBtn">blob</button>
+
+    <!-- popup buttons -->
+    <button id="clckBtn">popt</button>
+    <button id="vtprBtn">vew</button>
 </div>
 
-<!-- ————— SIDEBAR ————— -->
-<div id="sidebar" style="display:none;">
+<!-- SEARCH / MENU SIDEBAR -->
+<div id="searchContainer">
     <button id="closeBtn">Close</button>
     <button id="hdeBtn">hde</button>
-    <input id="searchInput" placeholder="Search...">
+
+    <input id="urlInput" placeholder="Enter URL...">
+    <input id="searchInput" placeholder="Search sites...">
+
+    <div id="autocomplete"></div>
     <div id="results"></div>
+
+    <h3>Saved Sites</h3>
+    <div id="savedSites"></div>
+
+    <h3>Working Sites</h3>
+    <div id="workingSites"></div>
 </div>
 
-<!-- ————— GAME FRAME ————— -->
-<iframe id="gameFrame" src="" style="width:100%;height:calc(100vh - 60px);border:none;"></iframe>
+<!-- VIEWER -->
+<div id="viewer"></div>
 
-<!-- ————— INVISIBLE MNU BUTTON ————— -->
+<!-- INVISIBLE MNU BUTTON -->
 <button id="mnuReveal">mnu</button>
 
 <script src="script.js"></script>
