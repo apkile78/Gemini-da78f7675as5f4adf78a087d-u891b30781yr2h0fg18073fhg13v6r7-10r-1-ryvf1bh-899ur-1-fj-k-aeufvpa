@@ -9,6 +9,10 @@ const viewer = document.getElementById("viewer");
 const autoBox = document.getElementById("autocomplete");
 const tstBtn = document.getElementById("tstBtn");
 
+// NEW UI-HIDE ELEMENTS
+const hdeBtn = document.getElementById("hdeBtn");
+const mnuReveal = document.getElementById("mnuReveal");
+
 let embedMode = "iframe";
 let popupMode = "about";
 let currentUrl = "";
@@ -416,3 +420,17 @@ vtprBtn.onclick = () => {
 //  CLOSE MENU
 // =========================================================
 closeBtn.onclick = () => searchContainer.classList.remove("active");
+
+// =========================================================
+//  UI HIDE / REVEAL SYSTEM (NEW)
+// =========================================================
+
+// Hide UI
+hdeBtn.onclick = () => {
+    document.body.classList.add("uiHidden");
+};
+
+// Reveal UI
+mnuReveal.onclick = () => {
+    document.body.classList.remove("uiHidden");
+};
