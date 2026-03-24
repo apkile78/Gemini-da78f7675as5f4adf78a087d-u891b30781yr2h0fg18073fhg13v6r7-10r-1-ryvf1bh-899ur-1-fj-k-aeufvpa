@@ -45,11 +45,10 @@ button.active {
     padding: 0 10px;
     box-sizing: border-box;
     gap: 6px;
-    transition: 0.25s ease;
     overflow: visible;
 }
 
-/* Search bar (leftmost) */
+/* Search bar */
 #urlInput {
     flex: 1;
     padding: 6px;
@@ -58,13 +57,12 @@ button.active {
     color: #fff;
 }
 
-/* Tiny spacing between middle group and embed group */
 .group-gap {
     width: 4px;
 }
 
 /* ——————————————————————————————
-   AUTOCOMPLETE (under top bar)
+   AUTOCOMPLETE
 —————————————————————————————— */
 #autocomplete {
     position: absolute;
@@ -106,7 +104,7 @@ button.active {
     left: 0;
 }
 
-#savedSites, #workingSites {
+#savedSites {
     max-height: 200px;
     overflow-y: auto;
     background: #181818;
@@ -179,30 +177,25 @@ body.uiHidden #mnuReveal:hover {
 —————————————————————————————— -->
 <div id="topBar">
 
-    <!-- LEFT GROUP -->
     <input id="urlInput" placeholder="Enter URL...">
     <button id="goBtn">Go</button>
     <button id="saveBtn">Save</button>
     <button id="openBtn">Menu</button>
 
-    <!-- MIDDLE GROUP -->
     <button id="clckBtn">popt</button>
     <button id="vtprBtn">vew</button>
 
-    <!-- POPUP MODE TOGGLES -->
     <button id="abtBtn" class="active">abt:blnk</button>
     <button id="blbBtn">blb</button>
 
     <div class="group-gap"></div>
 
-    <!-- EMBED MODE BUTTONS -->
     <button class="modeBtn active" data-mode="iframe">iframe</button>
     <button class="modeBtn" data-mode="object">js</button>
     <button class="modeBtn" data-mode="embed">embed</button>
 
 </div>
 
-<!-- AUTOCOMPLETE DROPDOWN -->
 <div id="autocomplete"></div>
 
 <!-- ——————————————————————————————
@@ -214,9 +207,6 @@ body.uiHidden #mnuReveal:hover {
 
     <h3>Saved Sites</h3>
     <div id="savedSites"></div>
-
-    <h3>Working Sites</h3>
-    <div id="workingSites"></div>
 </div>
 
 <!-- ——————————————————————————————
@@ -224,11 +214,15 @@ body.uiHidden #mnuReveal:hover {
 —————————————————————————————— -->
 <div id="viewer"></div>
 
-<!-- ——————————————————————————————
-     INVISIBLE MNU BUTTON
-—————————————————————————————— -->
 <button id="mnuReveal">mnu</button>
 
-<script src="script.js"></script>
+<!-- ——————————————————————————————
+     SCRIPTS (MODULAR)
+—————————————————————————————— -->
+<script src="core.js"></script>
+<script src="menu.js"></script>
+<script src="autocomplete.js"></script>
+<script src="main.js"></script>
+
 </body>
 </html>
