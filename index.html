@@ -2,52 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Navigator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="topBar">
-        <input id="urlInput" placeholder="Enter URL or search...">
-        <button id="goBtn">Go</button>
-        <button id="saveBtn">Save</button>
-        <button id="openBtn">Menu</button>
+        <input id="urlInput" placeholder="URL or Code...">
+        <button id="goBtn">GO</button>
+        <button id="saveBtn">SAV</button>
+        <button id="openBtn">MNU</button>
         
-        <div style="width: 2px; height: 20px; background: #333; margin: 0 5px;"></div>
+        <div style="width: 1px; height: 16px; background: #fff; margin: 0 2px;"></div>
 
-        <button id="clckBtn">popt</button>
-        <button id="vtprBtn">vew</button>
+        <button id="clckBtn">POPT</button>
+        <button id="vtprBtn">VEW</button>
 
-        <button id="abtBtn" class="active">abt</button>
-        <button id="blbBtn">blb</button>
+        <button id="abtBtn" class="active">ABT</button>
+        <button id="blbBtn">BLB</button>
 
         <button class="modeBtn active" data-mode="iframe">IFR</button>
         <button class="modeBtn" data-mode="object">OBJ</button>
+        <button class="modeBtn" data-mode="js">JS</button>
     </div>
 
     <div id="autocomplete"></div>
 
     <div id="searchContainer">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3>Bookmarks</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0">BOOKMARKS</h4>
             <button id="closeBtn">X</button>
         </div>
-        
-        <button id="hdeBtn" style="width: 100%; margin: 15px 0;">Hide UI (Ghost Mode)</button>
-
+        <button id="hdeBtn" style="width:100%; margin:10px 0;">GHOST MODE</button>
         <div id="savedSites"></div>
     </div>
 
     <div id="viewer"></div>
-
-    <button id="mnuReveal">MENU</button>
+    <button id="mnuReveal">REVEAL</button>
 
     <script src="siteDB.js"></script>
     <script src="core.js"></script>
     <script src="menu.js"></script>
     <script src="autocomplete.js"></script>
     <script src="main.js"></script>
-
 </body>
 </html>
