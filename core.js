@@ -19,11 +19,22 @@ document.querySelectorAll(".modeBtn").forEach(btn => {
 });
 
 // ——————————————————————————————
-// RENDER ENGINE
+// RENDER ENGINE (Optimized for Memory)
 // ——————————————————————————————
 function updateViewer(url) {
     window.currentUrl = url;
-    if (!url) { viewer.innerHTML = ""; coreEl = null; return; }
+    
+    // Memory Flush: Kill the old iframe's processes before removing it
+    if (coreEl) {
+        if (coreEl.tagName === "IFRAME") coreEl.src = "about:blank";
+        else coreEl.data = "";
+    }
+
+    if (!url) { 
+        viewer.innerHTML = ""; 
+        coreEl = null; 
+        return; 
+    }
 
     if (!coreEl) {
         coreEl = document.createElement("iframe");
@@ -43,9 +54,13 @@ function updateViewer(url) {
         if (coreEl.tagName !== tag) {
             const newEl = document.createElement(tag.toLowerCase());
             if (tag === "OBJECT") newEl.type = "text/html";
+            
+            // Swap elements
             coreEl.replaceWith(newEl);
             coreEl = newEl;
         }
+        
+        // Load the new content
         if (embedMode === "iframe") coreEl.src = url;
         else coreEl.data = url;
     }

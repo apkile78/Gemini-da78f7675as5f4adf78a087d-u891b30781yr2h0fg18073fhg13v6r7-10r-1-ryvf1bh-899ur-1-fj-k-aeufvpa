@@ -30,6 +30,15 @@ body {
 }
 
 /* ——————————————————————————————
+   GPU ACCELERATION (Performance Boost)
+—————————————————————————————— */
+#viewer iframe, #viewer object {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+/* ——————————————————————————————
    TOP BAR (Compact HUD)
 —————————————————————————————— */
 #topBar {
