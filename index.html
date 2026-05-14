@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigator - UPlugin Branch</title>
+    <title>Navigator - Plugin Dev</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="topBar">
-        <button id="ifrBtn" class="active">IFR</button>
-        <button id="jsBtn">JS</button>
-        <button id="objBtn">OBJ</button>
+        <button id="closeBtn">Close</button>
+        <button id="hdeBtn">hde</button>
         
-        <button id="plgBtn" title="Inject Universal Plugin">PLG</button>
+        <div class="spacer"></div> <input type="text" id="urlInput" placeholder="Enter URL...">
+        <button id="goBtn">Go</button>
+        <button id="saveBtn">Save</button>
+        <button id="menuBtn">Menu</button>
+        <button id="poptBtn">popt</button>
+        <button id="vewBtn">vew</button>
 
-        <input type="text" id="urlInput" placeholder="Enter URL or JS Code...">
-        <button id="goBtn">GO</button>
+        <div class="mode-group">
+            <button id="ifrBtn" class="active">iframe</button>
+            <button id="jsBtn">js</button>
+            <button id="objBtn">embed</button>
+            <button id="plgBtn" style="color: #0f0; border-color: #0f0;">PLG</button>
+        </div>
     </div>
 
-    <div id="viewer">
+    <div id="mainContainer" style="display: flex; height: calc(100vh - 40px);">
+        <div id="sidebar">
+            <h3>Saved Sites</h3>
+            <div id="savedSitesList">
+                </div>
         </div>
+
+        <div id="viewer" style="flex-grow: 1; background: #000;">
+            </div>
+    </div>
 
     <script src="core.js"></script>
 </body>
