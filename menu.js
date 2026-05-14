@@ -1,23 +1,22 @@
-// ===============================
-// MENU + SAVED SITES + UI HIDE
-// ===============================
-
 const searchContainer = document.getElementById("searchContainer");
 const savedContainer = document.getElementById("savedSites");
 
-// OPEN MENU
+// ——————————————————————————————
+// SIDEBAR TOGGLE
+// ——————————————————————————————
 document.getElementById("openBtn").onclick = () => {
-    searchContainer.classList.toggle("active");
+    searchContainer.classList.add("active");
 };
 
-// CLOSE MENU
 document.getElementById("closeBtn").onclick = () => {
     searchContainer.classList.remove("active");
 };
 
-// SAVE SITE
+// ——————————————————————————————
+// SAVE SITE LOGIC
+// ——————————————————————————————
 document.getElementById("saveBtn").onclick = () => {
-    const urlToSave = currentUrl || urlInput.value.trim();
+    const urlToSave = window.currentUrl || document.getElementById("urlInput").value.trim();
     if (!urlToSave) return;
 
     const savedSites = JSON.parse(localStorage.getItem("savedSites")) || [];
@@ -29,15 +28,9 @@ document.getElementById("saveBtn").onclick = () => {
     }
 };
 
-// DELETE SITE
-function deleteSite(index) {
-    const savedSites = JSON.parse(localStorage.getItem("savedSites")) || [];
-    savedSites.splice(index, 1);
-    localStorage.setItem("savedSites", JSON.stringify(savedSites));
-    displaySavedSites();
-}
-
-// DISPLAY SAVED SITES
+// ——————————————————————————————
+// DISPLAY & DELETE LOGIC
+// ——————————————————————————————
 function displaySavedSites() {
     savedContainer.innerHTML = "";
     const savedSites = JSON.parse(localStorage.getItem("savedSites")) || [];
@@ -46,20 +39,25 @@ function displaySavedSites() {
         const item = document.createElement("div");
         item.className = "savedItem";
 
+        // Site Link
         const link = document.createElement("span");
-        link.className = "link";
+        link.style.cssText = "cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:210px;";
         link.textContent = site;
         link.onclick = () => {
-            urlInput.value = site;
+            document.getElementById("urlInput").value = site;
+            updateViewer(site);
             searchContainer.classList.remove("active");
         };
 
+        // Delete Button
         const del = document.createElement("span");
-        del.className = "deleteBtn";
-        del.textContent = "x";
-        del.onclick = e => {
+        del.style.cssText = "color:#ff4444; cursor:pointer; font-weight:bold; padding-left:10px;";
+        del.textContent = "X";
+        del.onclick = (e) => {
             e.stopPropagation();
-            deleteSite(index);
+            savedSites.splice(index, 1);
+            localStorage.setItem("savedSites", JSON.stringify(savedSites));
+            displaySavedSites();
         };
 
         item.appendChild(link);
@@ -68,11 +66,15 @@ function displaySavedSites() {
     });
 }
 
+// Initial Render
 displaySavedSites();
 
-// UI HIDE SYSTEM
+// ——————————————————————————————
+// UI HIDE SYSTEM (GHOST MODE)
+// ——————————————————————————————
 document.getElementById("hdeBtn").onclick = () => {
     document.body.classList.add("uiHidden");
+    searchContainer.classList.remove("active");
 };
 
 document.getElementById("mnuReveal").onclick = () => {
