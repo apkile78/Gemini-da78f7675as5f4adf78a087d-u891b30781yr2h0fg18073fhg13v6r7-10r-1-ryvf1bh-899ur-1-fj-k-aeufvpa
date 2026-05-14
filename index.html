@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigator - Plugin Dev</title>
+    <title>Navigator - Plugin Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="topBar">
-        <button id="closeBtn">Close</button>
         <button id="hdeBtn">hde</button>
-        
-        <div class="spacer"></div> <input type="text" id="urlInput" placeholder="Enter URL...">
+        <input type="text" id="urlInput" placeholder="Enter URL or JS...">
         <button id="goBtn">Go</button>
         <button id="saveBtn">Save</button>
         <button id="menuBtn">Menu</button>
-        <button id="poptBtn">popt</button>
         <button id="vewBtn">vew</button>
+    </div>
 
-        <div class="mode-group">
-            <button id="ifrBtn" class="active">iframe</button>
+    <div id="menuPanel" style="display: none; position: absolute; right: 10px; top: 50px; background: #222; border: 1px solid #444; padding: 10px; z-index: 1000;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="ifrBtn">iframe</button>
             <button id="jsBtn">js</button>
             <button id="objBtn">embed</button>
-            <button id="plgBtn" style="color: #0f0; border-color: #0f0;">PLG</button>
+            <hr>
+            <button id="plgBtn" style="color: #0f0; border: 1px solid #0f0;">PLG (Inject)</button>
+            <button id="poptBtn">popt</button>
+            <button id="blbBtn">blb</button>
         </div>
     </div>
 
-    <div id="mainContainer" style="display: flex; height: calc(100vh - 40px);">
+    <div id="mainContainer" style="display: flex; height: calc(100vh - 50px);">
         <div id="sidebar">
-            <h3>Saved Sites</h3>
-            <div id="savedSitesList">
-                </div>
+            <h3 style="color: white; padding: 10px;">Saved Sites</h3>
+            <div id="savedSitesList"></div>
         </div>
 
         <div id="viewer" style="flex-grow: 1; background: #000;">

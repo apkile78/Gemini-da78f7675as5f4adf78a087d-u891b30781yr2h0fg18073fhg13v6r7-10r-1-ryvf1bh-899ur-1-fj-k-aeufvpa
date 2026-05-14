@@ -1,77 +1,104 @@
-// --- ORIGINAL FEATURES ---
+// --- STATE MANAGEMENT ---
 let savedSites = JSON.parse(localStorage.getItem('savedSites')) || [];
-const viewer = document.getElementById("viewer");
 let embedMode = "iframe";
 
-function renderSavedSites() {
-    const list = document.getElementById("savedSitesList");
-    if(!list) return;
-    list.innerHTML = "";
-    savedSites.forEach((site, index) => {
-        const div = document.createElement("div");
-        div.className = "site-item";
-        div.innerHTML = `<span onclick="updateViewer('${site}')">${site}</span> <button onclick="removeSite(${index})">x</button>`;
-        list.appendChild(div);
-    });
-}
+// --- UI ELEMENT REFS ---
+const viewer = document.getElementById("viewer");
+const urlInput = document.getElementById("urlInput");
+const menuPanel = document.getElementById("menuPanel");
 
-function removeSite(index) {
-    savedSites.splice(index, 1);
-    localStorage.setItem('savedSites', JSON.stringify(savedSites));
-    renderSavedSites();
-}
-
-document.getElementById("saveBtn").onclick = () => {
-    const url = document.getElementById("urlInput").value;
-    if (url && !savedSites.includes(url)) {
-        savedSites.push(url);
-        localStorage.setItem('savedSites', JSON.stringify(savedSites));
-        renderSavedSites();
-    }
-};
-
-// --- MODE & VIEWER LOGIC ---
+// --- CORE FUNCTIONS ---
 function updateViewer(url) {
+    if (!url) return;
     viewer.innerHTML = "";
-    const tag = embedMode === "js" ? "iframe" : (embedMode === "iframe" ? "iframe" : "object");
-    const el = document.createElement(tag);
-    
+    let el;
+
     if (embedMode === "js") {
+        el = document.createElement("iframe");
         viewer.appendChild(el);
         const doc = el.contentWindow.document;
         doc.open();
         doc.write(`<html><body style="background:#000;color:#fff;"><script>${url}<\/script></body></html>`);
         doc.close();
     } else {
-        if (tag === "iframe") {
-            el.setAttribute("sandbox", "allow-forms allow-modals allow-popups allow-scripts allow-same-origin");
-            el.src = url;
-        } else {
+        el = document.createElement(embedMode === "object" ? "object" : "iframe");
+        if (embedMode === "object") {
             el.data = url;
             el.type = "text/html";
+        } else {
+            el.src = url;
+            el.setAttribute("sandbox", "allow-forms allow-modals allow-popups allow-scripts allow-same-origin");
         }
-        el.style.width = "100%"; el.style.height = "100%"; el.style.border = "none";
+        el.style.width = "100%";
+        el.style.height = "100%";
+        el.style.border = "none";
         viewer.appendChild(el);
     }
 }
 
-// --- PLUGIN BRIDGE ---
-async function devInject() {
-    const target = document.querySelector("#viewer iframe") || document.querySelector("#viewer object");
+function renderSavedSites() {
+    const list = document.getElementById("savedSitesList");
+    list.innerHTML = "";
+    savedSites.forEach((site, index) => {
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.padding = "5px";
+        item.innerHTML = `<span style="color:#aaa; cursor:pointer;">${site}</span><button onclick="removeSite(${index})">x</button>`;
+        item.querySelector('span').onclick = () => { urlInput.value = site; updateViewer(site); };
+        list.appendChild(item);
+    });
+}
+
+window.removeSite = (index) => {
+    savedSites.splice(index, 1);
+    localStorage.setItem('savedSites', JSON.stringify(savedSites));
+    renderSavedSites();
+};
+
+// --- BUTTON LISTENERS ---
+
+// Top Bar
+document.getElementById("goBtn").onclick = () => updateViewer(urlInput.value);
+
+document.getElementById("saveBtn").onclick = () => {
+    if (urlInput.value && !savedSites.includes(urlInput.value)) {
+        savedSites.push(urlInput.value);
+        localStorage.setItem('savedSites', JSON.stringify(savedSites));
+        renderSavedSites();
+    }
+};
+
+document.getElementById("menuBtn").onclick = () => {
+    menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
+};
+
+document.getElementById("vewBtn").onclick = () => {
+    if (urlInput.value) window.open(urlInput.value, '_blank');
+};
+
+document.getElementById("hdeBtn").onclick = () => {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.style.display = sidebar.style.display === "none" ? "block" : "none";
+};
+
+// Menu Panel Buttons
+document.getElementById("ifrBtn").onclick = () => { embedMode = "iframe"; menuPanel.style.display = "none"; };
+document.getElementById("jsBtn").onclick = () => { embedMode = "js"; menuPanel.style.display = "none"; };
+document.getElementById("objBtn").onclick = () => { embedMode = "object"; menuPanel.style.display = "none"; };
+
+document.getElementById("plgBtn").onclick = async () => {
+    const target = viewer.querySelector("iframe") || viewer.querySelector("object");
     if (!target) return alert("Load a site first!");
     try {
         const res = await fetch('./plugin/plugin-core.js');
         const code = await res.text();
         target.contentWindow.eval(code);
-    } catch (e) { alert("Injected failed - Try OBJ mode."); }
-}
+        menuPanel.style.display = "none";
+    } catch (e) {
+        alert("Injection blocked. Try 'embed' mode.");
+    }
+};
 
-// Bindings
-document.getElementById("goBtn").onclick = () => updateViewer(document.getElementById("urlInput").value);
-document.getElementById("plgBtn").onclick = devInject;
-document.getElementById("ifrBtn").onclick = () => embedMode = "iframe";
-document.getElementById("jsBtn").onclick = () => embedMode = "js";
-document.getElementById("objBtn").onclick = () => embedMode = "object";
-
-// Initialize
+// Init
 renderSavedSites();
