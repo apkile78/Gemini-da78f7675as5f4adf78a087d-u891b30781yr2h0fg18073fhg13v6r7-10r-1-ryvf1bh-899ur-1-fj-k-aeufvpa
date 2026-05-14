@@ -1,104 +1,109 @@
-// --- STATE MANAGEMENT ---
-let savedSites = JSON.parse(localStorage.getItem('savedSites')) || [];
-let embedMode = "iframe";
-
-// --- UI ELEMENT REFS ---
-const viewer = document.getElementById("viewer");
 const urlInput = document.getElementById("urlInput");
-const menuPanel = document.getElementById("menuPanel");
+const viewer = document.getElementById("viewer");
 
-// --- CORE FUNCTIONS ---
+let embedMode = "iframe";
+let popupMode = "about";
+window.currentUrl = ""; 
+let coreEl = null;
+
+// ——————————————————————————————
+// MODE SWITCHING
+// ——————————————————————————————
+document.querySelectorAll(".modeBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".modeBtn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        embedMode = btn.dataset.mode;
+        if (window.currentUrl) updateViewer(window.currentUrl);
+    });
+});
+
+// ——————————————————————————————
+// RENDER ENGINE
+// ——————————————————————————————
 function updateViewer(url) {
-    if (!url) return;
-    viewer.innerHTML = "";
-    let el;
+    window.currentUrl = url;
+    if (!url) { viewer.innerHTML = ""; coreEl = null; return; }
+
+    if (!coreEl) {
+        coreEl = document.createElement("iframe");
+        viewer.innerHTML = "";
+        viewer.appendChild(coreEl);
+    }
 
     if (embedMode === "js") {
-        el = document.createElement("iframe");
-        viewer.appendChild(el);
-        const doc = el.contentWindow.document;
+        const doc = coreEl.contentWindow.document;
         doc.open();
-        doc.write(`<html><body style="background:#000;color:#fff;"><script>${url}<\/script></body></html>`);
+        doc.write(`<html><body style="background:#000;color:#fff;font-family:monospace;padding:10px;">
+            <script>try{ ${url} }catch(e){ document.write('<span style="color:red">ERR: '+e.message+'</span>'); }<\/script>
+        </body></html>`);
         doc.close();
     } else {
-        el = document.createElement(embedMode === "object" ? "object" : "iframe");
-        if (embedMode === "object") {
-            el.data = url;
-            el.type = "text/html";
-        } else {
-            el.src = url;
-            el.setAttribute("sandbox", "allow-forms allow-modals allow-popups allow-scripts allow-same-origin");
+        const tag = embedMode === "iframe" ? "IFRAME" : "OBJECT";
+        if (coreEl.tagName !== tag) {
+            const newEl = document.createElement(tag.toLowerCase());
+            if (tag === "OBJECT") newEl.type = "text/html";
+            coreEl.replaceWith(newEl);
+            coreEl = newEl;
         }
-        el.style.width = "100%";
-        el.style.height = "100%";
-        el.style.border = "none";
-        viewer.appendChild(el);
+        if (embedMode === "iframe") coreEl.src = url;
+        else coreEl.data = url;
     }
 }
 
-function renderSavedSites() {
-    const list = document.getElementById("savedSitesList");
-    list.innerHTML = "";
-    savedSites.forEach((site, index) => {
-        const item = document.createElement("div");
-        item.style.display = "flex";
-        item.style.justifyContent = "space-between";
-        item.style.padding = "5px";
-        item.innerHTML = `<span style="color:#aaa; cursor:pointer;">${site}</span><button onclick="removeSite(${index})">x</button>`;
-        item.querySelector('span').onclick = () => { urlInput.value = site; updateViewer(site); };
-        list.appendChild(item);
-    });
+function loadSite() {
+    let url = urlInput.value.trim();
+    if (!url) return;
+    if (!url.startsWith("http") && embedMode !== "js") url = "https://" + url;
+    updateViewer(url);
 }
 
-window.removeSite = (index) => {
-    savedSites.splice(index, 1);
-    localStorage.setItem('savedSites', JSON.stringify(savedSites));
-    renderSavedSites();
-};
+document.getElementById("goBtn").onclick = loadSite;
+urlInput.onkeydown = e => { if (e.key === "Enter") loadSite(); };
 
-// --- BUTTON LISTENERS ---
+// ——————————————————————————————
+// STEALTH POPUPS
+// ——————————————————————————————
+const abtBtn = document.getElementById("abtBtn");
+const blbBtn = document.getElementById("blbBtn");
 
-// Top Bar
-document.getElementById("goBtn").onclick = () => updateViewer(urlInput.value);
+abtBtn.onclick = () => { popupMode = "about"; abtBtn.classList.add("active"); blbBtn.classList.remove("active"); };
+blbBtn.onclick = () => { popupMode = "blob"; blbBtn.classList.add("active"); abtBtn.classList.remove("active"); };
 
-document.getElementById("saveBtn").onclick = () => {
-    if (urlInput.value && !savedSites.includes(urlInput.value)) {
-        savedSites.push(urlInput.value);
-        localStorage.setItem('savedSites', JSON.stringify(savedSites));
-        renderSavedSites();
+function launchStealth(targetUrl) {
+    const html = `<html><body style="margin:0;background:#000;"><iframe src="${targetUrl}" style="width:100vw;height:100vh;border:none;"></iframe></body></html>`;
+    if (popupMode === "about") {
+        const win = window.open("about:blank", "_blank");
+        win.document.write(html); win.document.close();
+    } else {
+        const blob = new Blob([html], { type: "text/html" });
+        window.open(URL.createObjectURL(blob), "_blank");
     }
+}
+
+document.getElementById("clckBtn").onclick = () => launchStealth(window.location.href);
+document.getElementById("vtprBtn").onclick = () => {
+    let url = window.currentUrl || urlInput.value.trim();
+    if (url) launchStealth(url.startsWith("http") ? url : "https://" + url);
 };
 
-document.getElementById("menuBtn").onclick = () => {
-    menuPanel.style.display = menuPanel.style.display === "none" ? "block" : "none";
-};
-
-document.getElementById("vewBtn").onclick = () => {
-    if (urlInput.value) window.open(urlInput.value, '_blank');
-};
-
-document.getElementById("hdeBtn").onclick = () => {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.style.display = sidebar.style.display === "none" ? "block" : "none";
-};
-
-// Menu Panel Buttons
-document.getElementById("ifrBtn").onclick = () => { embedMode = "iframe"; menuPanel.style.display = "none"; };
-document.getElementById("jsBtn").onclick = () => { embedMode = "js"; menuPanel.style.display = "none"; };
-document.getElementById("objBtn").onclick = () => { embedMode = "object"; menuPanel.style.display = "none"; };
-
+// ——————————————————————————————
+// THE PLUGIN BRIDGE
+// ——————————————————————————————
 document.getElementById("plgBtn").onclick = async () => {
-    const target = viewer.querySelector("iframe") || viewer.querySelector("object");
-    if (!target) return alert("Load a site first!");
+    if (!coreEl) return alert("Load a site first!");
     try {
-        const res = await fetch('./plugin/plugin-core.js');
-        const code = await res.text();
-        target.contentWindow.eval(code);
-        menuPanel.style.display = "none";
+        const response = await fetch('./plugin/plugin-core.js');
+        const code = await response.text();
+        
+        // This injects the code directly into your current iframe/object
+        coreEl.contentWindow.eval(code);
+        
+        // Close the menu smoothly using YOUR native CSS class
+        document.getElementById("searchContainer").classList.remove("active");
+        
     } catch (e) {
-        alert("Injection blocked. Try 'embed' mode.");
+        alert("Injection failed. Try OBJ mode.");
+        console.error(e);
     }
 };
-
-// Init
-renderSavedSites();

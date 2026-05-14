@@ -2,43 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigator - Plugin Edition</title>
+    <title>Navigator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="topBar">
-        <button id="hdeBtn">hde</button>
-        <input type="text" id="urlInput" placeholder="Enter URL or JS...">
-        <button id="goBtn">Go</button>
-        <button id="saveBtn">Save</button>
-        <button id="menuBtn">Menu</button>
-        <button id="vewBtn">vew</button>
+        <input id="urlInput" placeholder="URL or Code...">
+        <button id="goBtn">GO</button>
+        <button id="saveBtn">SAV</button>
+        <button id="openBtn">MNU</button>
+        
+        <div style="width: 1px; height: 16px; background: #fff; margin: 0 2px;"></div>
+
+        <button id="clckBtn">POPT</button>
+        <button id="vtprBtn">VEW</button>
+
+        <button id="abtBtn" class="active">ABT</button>
+        <button id="blbBtn">BLB</button>
+
+        <button class="modeBtn active" data-mode="iframe">IFR</button>
+        <button class="modeBtn" data-mode="object">OBJ</button>
+        <button class="modeBtn" data-mode="js">JS</button>
     </div>
 
-    <div id="menuPanel" style="display: none; position: absolute; right: 10px; top: 50px; background: #222; border: 1px solid #444; padding: 10px; z-index: 1000;">
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button id="ifrBtn">iframe</button>
-            <button id="jsBtn">js</button>
-            <button id="objBtn">embed</button>
-            <hr>
-            <button id="plgBtn" style="color: #0f0; border: 1px solid #0f0;">PLG (Inject)</button>
-            <button id="poptBtn">popt</button>
-            <button id="blbBtn">blb</button>
+    <div id="autocomplete"></div>
+
+    <div id="searchContainer">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0">BOOKMARKS</h4>
+            <button id="closeBtn">X</button>
         </div>
+        
+        <button id="plgBtn" style="width:100%; margin:10px 0; background: #000; color: #0f0; border: 1px solid #0f0; cursor: pointer;">INJECT PLUGIN</button>
+        
+        <button id="hdeBtn" style="width:100%; margin:10px 0;">GHOST MODE</button>
+        <div id="savedSites"></div>
     </div>
 
-    <div id="mainContainer" style="display: flex; height: calc(100vh - 50px);">
-        <div id="sidebar">
-            <h3 style="color: white; padding: 10px;">Saved Sites</h3>
-            <div id="savedSitesList"></div>
-        </div>
+    <div id="viewer"></div>
+    <button id="mnuReveal">REVEAL</button>
 
-        <div id="viewer" style="flex-grow: 1; background: #000;">
-            </div>
-    </div>
-
+    <script src="siteDB.js"></script>
     <script src="core.js"></script>
+    <script src="menu.js"></script>
+    <script src="autocomplete.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
